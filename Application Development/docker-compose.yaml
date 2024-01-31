@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    container_name: AreaDatabase
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: AreaDatabase
+      PGDATA: /data/postgres
+    volumes:
+       - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  area_server_api:
+    container_name: AreaServerAPI
+    build:
+      context: ./server
+      dockerfile: ./AreaServerAPI/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__DefaultConnection: "User ID=postgres;Password=1234;Host=postgres;Port=5432;Database=AreaDatabase;"
+    networks:
+      - postgres
+  
+  area_server_web:
+    container_name: AreaServerWeb
+    image: areaserverweb
+    build:
+      context: ./Area-web/
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+  
+  # area_server_mobile:
+  #   container_name: AreaServerMobile
+  #   image: areaservermobile
+  #   build:
+  #     dockerfile: ./mobile/Dockerfile
+  #   ports:
+  #     - '8082:80'
+
+  area_server_worker:
+    container_name: AreaServerWorker
+    image: areaserverworker
+    build:
+      context: ./server
+      dockerfile: ./AreaServer.Worker/Dockerfile
+    depends_on:
+      - postgres
+      - area_server_api
+    environment:
+      ConnectionStrings__DefaultConnection: "User ID=postgres;Password=1234;Host=postgres;Port=5432;Database=AreaDatabase;"
+    networks:
+      - postgres
+    ports:
+      - '8083:80'
+    restart: always
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:

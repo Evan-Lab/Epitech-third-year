@@ -1,0 +1,8 @@
+configuration-as-code:latest
+credentials:latest
+github:latest
+git:latest
+job-dsl:latest
+script-security:latest
+role-strategy:latest
+ws-cleanup:latest

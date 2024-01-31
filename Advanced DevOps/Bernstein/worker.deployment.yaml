@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: worker
+    namespace: default
+    labels:
+        apps: worker
+spec:
+    selector:
+        matchLabels:
+            app: worker
+    template:
+        metadata:
+            labels:
+                app: worker
+        spec:
+            containers:
+            - name: worker
+              image: epitechcontent/t-dop-600-worker:k8s
+              resources:
+              limits:
+                memory: 256M
+              envFrom:
+                - configMapRef:
+                    name: redis-configmap
+                - configMapRef:
+                    name: postgres-configmap
+                - secretRef:
+                    name: postgres-secret
+            restartPolicy: Always

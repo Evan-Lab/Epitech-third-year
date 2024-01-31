@@ -1,0 +1,21 @@
+﻿[SQLite Migrations nuget packages to install on the AreaServer.Infrastructure project ]
+
+Microsoft.EntityFrameworkCore
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Sqlite
+
+[SQLite Migrations nuget packages to install on the AreaServerAPI project ]
+
+Microsoft.EntityFrameworkCore.Design
+Microsoft.EntityFrameworkCore.Tools
+
+
+[DATABASE FIRST CREATION]
+
+dotnet ef migrations add InitialCreate -s .\AreaServerAPI\  -p .\AreaServer.Infrastructure\ --verbose
+dotnet ef database update -s .\AreaServerAPI\
+
+[REFRESH: AFTER EACH UPDATE OF A DATABASE MODEL CLASS]
+
+dotnet ef migrations add NewFieldAdded -s .\AreaServerAPI\  -p .\AreaServer.Infrastructure\ --verbose
+dotnet ef database update -s .\AreaServerAPI\  -p .\AreaServer.Infrastructure\ --verbose

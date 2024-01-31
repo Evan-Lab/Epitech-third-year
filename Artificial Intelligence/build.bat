@@ -1,0 +1,1 @@
+python -m PyInstaller --onefile src/main.py -n pbrain-gomoku-ai

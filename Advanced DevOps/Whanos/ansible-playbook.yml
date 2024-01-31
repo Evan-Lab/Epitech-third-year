@@ -1,0 +1,86 @@
+---
+- name: launch Docker-Compose and install all jenkins plugins
+  hosts: default
+  become: true
+  gather_facts: no
+
+  tasks:
+    - name: Update apt package
+      apt:
+        update_cache: yes
+
+    - name: Install docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+
+    - name: Add GPG Docker Key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add docker repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: latest
+
+    - name: Download last version of Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'
+      ignore_errors: true
+
+    - name: Check Docker Compose installation
+      command: docker-compose --version
+
+
+    - name: Create directory on remote
+      file:
+        path: /home/ubuntu/whanos
+        state: directory
+        mode: '0755'
+
+    - name: Copy plugin script
+      ansible.builtin.copy:
+        src: docker-compose.yml
+        dest: /home/ubuntu/whanos/
+        mode: '0664'
+
+    - name: Copy plugin script1
+      ansible.builtin.copy:
+        src: Dockerfile
+        dest: /home/ubuntu/whanos/
+        mode: '0664'
+
+    - name: Copy plugin script2
+      ansible.builtin.copy:
+        src: jenkins
+        dest: /home/ubuntu/whanos/
+        mode: '0777'
+
+    - name: Copy plugin script3
+      ansible.builtin.copy:
+        src: images
+        dest: /home/ubuntu/whanos/
+        mode: '0664'
+
+    - name: Copy plugin env
+      ansible.builtin.copy:
+        src: .env
+        dest: /home/ubuntu/whanos/
+        mode: '0664'
+
+    - name: Launch docker-compose
+      ansible.builtin.shell:
+        cmd: docker-compose up -d
+        chdir: /home/ubuntu/whanos

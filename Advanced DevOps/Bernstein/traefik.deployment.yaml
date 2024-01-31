@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: traefik-service-account
+  namespace: kube-public
+
+---
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: traefik-deployment
+  namespace: kube-public
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-service-account
+      containers:
+        - name: traefik
+          image: traefik:2.7
+          ports:
+            - name: http
+              containerPort: 80
+            - name: admin
+              containerPort: 8080
+      restartPolicy: Always

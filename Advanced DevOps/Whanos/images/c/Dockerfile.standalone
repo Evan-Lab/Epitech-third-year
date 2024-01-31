@@ -1,0 +1,15 @@
+FROM gcc:latest
+
+SHELL ["/bin/bash", "-c"]
+
+COPY . /app
+
+WORKDIR /app
+
+COPY Makefile .
+
+RUN make
+
+RUN rm -rf app Makefile
+
+CMD ["./compiled-app"]

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: result-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: result
+  template:
+    metadata:
+      labels:
+        app: result
+    spec:
+      containers:
+        - name: result
+          image: epitechcontent/t-dop-600-result:k8s
+          ports:
+            - containerPort: 80
+          envFrom:
+          - secretRef:
+              name: postgres-secret
+          - configMapRef:
+              name: postgres-configmap
+          resources:
+            limits:
+              memory: "128M"
+      restartPolicy: Always
